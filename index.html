@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spørsmål til Calle</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: header (title, search, language) over wrapping colour-coded category buttons, then a grid of Q&A cards tinted by category */
+:root{
+  --ink:#001219; --bg:#FFFFFF; --surface:#FFFFFF; --fg:#001219; --muted:#3E5560; --line:#D5DEE1;
+  --note-bg:#F8E9E9; --note-line:#9B2226;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#001219; --surface:#06202A; --fg:#FFFFFF; --muted:#A9BCC3; --line:#173640;
+  --note-bg:#2A0F12; --note-line:#E06A6E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#001219; --surface:#06202A; --fg:#FFFFFF; --muted:#A9BCC3; --line:#173640;
+  --note-bg:#2A0F12; --note-line:#E06A6E; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+header{background:var(--bg);padding-block:16px 14px;border-bottom:1px solid var(--line);display:grid;gap:14px}
+@media (min-width:700px){header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5}}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
+h1{font-family:var(--display);font-weight:800;font-size:1.5rem;margin:0;text-wrap:balance;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:.85rem;margin:2px 0 0}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input[type=search]{font:inherit;font-size:.95rem;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);width:min(260px,100%)}
+.lang{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.lang button{font:inherit;font-size:.85rem;font-weight:700;padding:7px 12px;border:0;background:var(--surface);color:var(--muted);cursor:pointer}
+.lang button[aria-pressed=true]{background:var(--fg);color:var(--bg)}
+nav{display:flex;flex-wrap:wrap;gap:8px}
+nav button{font:inherit;font-size:.92rem;font-weight:700;padding:8px 14px;border:2px solid var(--c);border-radius:999px;background:var(--c);color:var(--on);cursor:pointer;display:flex;gap:8px;align-items:center;opacity:.72;transition:opacity .12s, transform .12s}
+nav button:hover{opacity:1}
+nav button .n{font-size:.75rem;font-variant-numeric:tabular-nums;opacity:.8}
+nav button[aria-pressed=true]{opacity:1;box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--c);transform:translateY(-1px)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+main{padding-top:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px;align-items:start}
+.card{background:var(--surface);border:2px solid var(--c);border-radius:10px;padding:16px 18px;min-width:0;display:grid;gap:8px}
+.card .cat{justify-self:start;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;background:var(--c);color:var(--on);padding:2px 8px;border-radius:4px}
+.card h2{font-family:var(--display);font-weight:600;font-size:1.12rem;line-height:1.3;margin:0;text-wrap:balance}
+.card .a p{margin:0 0 6px}.card .a p:last-child{margin:0}
+.card .a ul{margin:4px 0;padding-left:20px}
+.card .note{font-size:.85rem;background:var(--note-bg);color:var(--fg);border-left:3px solid var(--note-line);padding:6px 10px;border-radius:4px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.9rem}
+th,td{text-align:right;padding:4px 8px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:700;font-size:.8rem}
+b{font-weight:700}
+.empty{color:var(--muted);padding:24px 0}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .18s ease-out}@keyframes in{from{transform:translateY(4px)}to{transform:none}}}
+@media (prefers-reduced-motion:reduce){nav button{transition:none}}
+
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.st{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:4px;border:1.5px solid var(--fg)}
+.st.open{background:var(--fg);color:var(--bg)}
+.st.part{border-style:dashed}
+.st.done{opacity:.75}
+.who{font-size:.8rem;color:var(--muted)}
+.lbl{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.ask{border-top:1px solid var(--line);padding-top:8px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters button{font:inherit;font-size:.85rem;font-weight:700;padding:6px 12px;border:1.5px solid var(--fg);border-radius:8px;background:var(--surface);color:var(--fg);cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--fg);color:var(--bg)}
+.legend{font-size:.8rem;color:var(--muted)}
+</style></head>
+<body>
+<header>
+  <div class="top">
+    <div>
+      <h1 id="h1">Spørsmål til Calle · møtet 28. oktober</h1>
+      <p class="sub" id="sub">Spørsmål fra naboene, også fra dem som ikke kan komme. Svar vi allerede har fått, står under hvert spørsmål.</p>
+    </div>
+    <div class="tools">
+      <input type="search" id="q" placeholder="Søk…" aria-label="Søk">
+      <div class="lang" role="group" aria-label="Språk">
+        <button id="l-no" aria-pressed="true">NO</button><button id="l-en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+  <div class="filters">
+    <button id="f-all" aria-pressed="true">Alle</button>
+    <button id="f-open" aria-pressed="false">Åpne</button>
+    <span class="legend" id="legend"></span>
+  </div>
+  <nav id="cats" aria-label="Kategorier"></nav>
+</header>
+<main><div class="grid" id="grid"></div><p class="empty" id="empty" hidden></p></main>
+
+<script>
+const CATS=[
+ {id:"offer",no:"Tilbudet",en:"The offer",c:"#0A9396",on:"#FFFFFF"},
+ {id:"cost",no:"Kostnad og «lån»",en:"Cost and the \"loan\"",c:"#94D2BD",on:"#001219"},
+ {id:"agr",no:"Avtalen",en:"The agreement",c:"#E9D8A6",on:"#001219"},
+ {id:"inst",no:"Installasjon og grunn",en:"Installation and ground",c:"#EE9B00",on:"#001219"},
+ {id:"svc",no:"Drift og feil",en:"Service and faults",c:"#CA6702",on:"#FFFFFF"},
+ {id:"tel",no:"Bytte fra Telenor",en:"Switching from Telenor",c:"#BB3E03",on:"#FFFFFF"},
+ {id:"alt",no:"Alternativer",en:"Alternatives",c:"#AE2012",on:"#FFFFFF"}
+];
+const ST={open:{no:"Åpen",en:"Open"},part:{no:"Delvis besvart",en:"Partly answered"},done:{no:"Besvart, spør likevel",en:"Answered, ask anyway"}};
+/* Each item: c=category, s=status, w=asked by, q=question, a=answer so far (or ""), k=what to ask tonight */
+const Q=[
+/* COST */
+{c:"cost",s:"done",w:"Guile og Linn",
+ q:{no:"Hvorfor fordeles etableringskostnaden over 84 måneder når bindingstiden er 24 måneder?",en:"Why is the establishment cost spread over 84 months when the binding is 24 months?"},
+ a:{no:"Den nye ekomloven tillater maks 24 måneders binding for internettavtalen, så installasjonen nedbetales i en egen infrastrukturavtale. Ingen leverandør går i null på 24 måneder uten svært høy månedspris (Calle, 27. okt., og «Informasjon om infra-avtalen»).",en:"The new Ekomlov allows at most 24 months' binding for the internet agreement, so installation is repaid under a separate infrastructure agreement. No provider breaks even in 24 months without a very high monthly price (Calle, 27 Oct, and the infra-agreement info sheet)."},
+ k:{no:"Be Calle forklare dette kort for alle i møtet.",en:"Ask Calle to explain this briefly for everyone."}},
+{c:"cost",s:"done",w:"Guile og Linn",
+ q:{no:"Må vi betale resterende ca. 283 500 kr hvis avtalen avsluttes etter 24 måneder?",en:"Do we have to pay the remaining ~283,500 kr if the agreement ends after 24 months?"},
+ a:{no:"Ja, ifølge Vedlegg 5 overtar sameiet resten av avdragene hvis internettavtalen avsluttes, med mindre en ny leverandør kjøper ut restbeløpet. Beløpet synker hvert år og er 0 etter 7 år. Se den blå boksen i «Forklaring Vedlegg 5».",en:"Yes. Under Vedlegg 5 the sameie takes over the remaining instalments if the internet agreement ends, unless a new provider buys out the remainder. The amount falls every year and is 0 after 7 years. See the blue box in «Forklaring Vedlegg 5»."},
+ k:{no:"Be Calle bekrefte dette tydelig, og forklare hvor vanlig det er at en ny leverandør overtar restbeløpet.",en:"Ask Calle to confirm this clearly, and how common it is for a new provider to take over the remainder."}},
+{c:"cost",s:"open",w:"Guile og Linn",
+ q:{no:"Dekker GlobalConnect avdragene så lenge vi er kunder, også etter 24 måneder når avtalen løper videre uten ny bindingstid?",en:"Does GlobalConnect cover the instalments as long as we're customers, including after 24 months when the agreement runs on without a new binding period?"},
+ a:{no:"Calle og infoarket sier «så lenge dere har en internettavtale med oss». Men Vedlegg 5 sier «aktiv kollektiv avtale … med en fastsatt løpende avtaleperiode/bindingstid», som kan leses som at en løpende avtale uten binding ikke teller.",en:"Calle and the info sheet say «as long as you have an internet agreement with us». But Vedlegg 5 says «active collective agreement … with a fixed running agreement period/binding», which could be read as excluding a rolling agreement without binding."},
+ k:{no:"Be om skriftlig bekreftelse på at avdragene dekkes også når avtalen løper videre etter 24 måneder uten ny binding.",en:"Ask for written confirmation that instalments are covered when the agreement runs on after 24 months without a new binding."}},
+{c:"cost",s:"done",w:"Marte",
+ q:{no:"Har vi fått en spesifisering av beregningsgrunnlaget for etableringskostnaden?",en:"Have we received a breakdown of how the establishment cost is calculated?"},
+ a:{no:"En grov fordeling (23. okt.): graving, boring og luftstrekk ca. 100 000 kr, materiell ca. 100 000 kr, arbeidstimer ca. 140 000 kr, gebyrer, renter og prisjustering ca. 60 000 kr. Calle skrev 27. okt. at det ikke finnes en mer detaljert fordeling: entreprenøren priser per boenhet etter befaring.",en:"A rough split (23 Oct): digging, drilling and aerial ~100,000 kr, materials ~100,000 kr, work hours ~140,000 kr, fees, interest and inflation ~60,000 kr. Calle wrote on 27 Oct that no more detailed split exists: the contractor prices per unit after the survey."},
+ k:{no:"Spør om entreprenørens pris per boenhet kan deles, eller om dette er så detaljert det blir.",en:"Ask whether the contractor's per-unit price can be shared, or whether this is as detailed as it gets."}},
+{c:"cost",s:"part",w:"Marte",
+ q:{no:"Er det renter på nedbetalingen?",en:"Is there interest on the repayment?"},
+ a:{no:"84 × 4 725 kr = etableringskostnaden, så det kommer ingen renter i tillegg. Men den grove fordelingen viser ca. 60 000 kr i «gebyrer, renter, prisjustering» inne i totalbeløpet.",en:"84 × 4,725 kr = the establishment cost, so no interest is added on top. But the rough breakdown shows ~60,000 kr of «fees, interest, inflation» built into the total."},
+ k:{no:"Be Calle forklare hva de 60 000 kr dekker.",en:"Ask Calle what the 60,000 kr covers."}},
+{c:"cost",s:"open",w:"",
+ q:{no:"Hvorfor er beløpet økt fra 395 660 kr i tilbudet til 396 896 kr i avtalen?",en:"Why did the amount rise from 395,660 kr in the offer to 396,896 kr in the contract?"},
+ a:{no:"",en:""},
+ k:{no:"Kort spørsmål. Forskjellen er ca. 15 kr i måneden og betyr bare noe ved tidlig utgang.",en:"Quick question. The difference is ~15 kr a month and only matters on early exit."}},
+{c:"cost",s:"part",w:"Nabo",
+ q:{no:"400 000 kr virker høyt. Er det et realistisk estimat?",en:"400,000 kr seems high. Is it a realistic estimate?"},
+ a:{no:"Calle: kostnaden er GlobalConnects, og de har selv interesse av å holde den lav, siden det binder mindre kapital. Tilsvarer ca. 57 000 kr per hus, inkludert luftstrekk, graving over asfalt, koblingsbokser, kabelkanaler, boring og utstyr.",en:"Calle: the cost is GlobalConnect's, and they have an interest in keeping it low, as it ties up less capital. It's ~57,000 kr per house, including aerial line, asphalt crossing, splice boxes, ducts, drilling and equipment."},
+ k:{no:"",en:""}},
+{c:"cost",s:"done",w:"Cecilie",
+ q:{no:"Hva er bruddgebyret, og teller tilleggstjenester med?",en:"What is the break fee, and do add-ons count?"},
+ a:{no:"Gjelder bare i de første 24 månedene. Tilleggstjenester kan sies opp månedlig, og TV teller ikke med (Calle, 23. okt.).",en:"Only applies in the first 24 months. Add-ons can be cancelled monthly, and TV doesn't count (Calle, 23 Oct)."},
+ k:{no:"",en:""}},
+/* AGREEMENT */
+{c:"agr",s:"part",w:"Guile og Linn",
+ q:{no:"Kan vi avslutte uten bruddgebyr eller andre kostnader hvis GlobalConnect gjør vesentlige endringer som er negative for oss?",en:"Can we exit without a break fee or other costs if GlobalConnect makes significant changes that are negative for us?"},
+ a:{no:"Øker kostnaden før bygging, kan vi si nei til ny pris og avslutte gratis (4.2). Ved vesentlig mislighold kan sameiet heve avtalen (6.6). Avtalen sier ikke hva som skjer med restavdragene hvis vi går ut på grunn av prisendringer etter 3.3 (b) eller endrede vilkår.",en:"If the cost rises before construction, we can refuse a new price and cancel for free (4.2). For material breach the sameie can terminate (6.6). The agreement doesn't say what happens to remaining instalments if we leave because of price changes under 3.3 (b) or changed terms."},
+ k:{no:"Spør: hvis prisen eller vilkårene endres vesentlig, kan vi da gå ut uten å betale restavdragene?",en:"Ask: if the price or terms change significantly, can we leave without paying the remaining instalments?"}},
+{c:"agr",s:"part",w:"Guile og Linn",
+ q:{no:"Kan vi fritt velge leverandør over spredenettet etter at avtalen er avsluttet?",en:"Can we freely choose a provider over the network after the agreement ends?"},
+ a:{no:"Etter full nedbetaling eier sameiet nettet og kan la hvem som helst bruke det gratis. Før det har GlobalConnect enerett (Vedlegg 5), og en ny leverandør må overta restbeløpet.",en:"After full repayment the sameie owns the network and can let anyone use it for free. Before that, GlobalConnect has exclusivity (Vedlegg 5), and a new provider must take over the remainder."},
+ k:{no:"Se også spørsmålet om åpen tilgang.",en:"See also the open-access question."}},
+{c:"agr",s:"open",w:"Nabo",
+ q:{no:"Konkurransetilsynet krever at GlobalConnects nett åpnes for andre fiberleverandører. Betyr det at vi får flere leverandører å velge mellom?",en:"The competition authority requires GlobalConnect's network to be opened to other fiber providers. Does that mean we'll get more providers to choose from?"},
+ a:{no:"Åpen tilgang gjelder der GlobalConnect har nett inn til husene. Vi har det ikke før installasjonen er gjort. Hvordan det fungerer i praksis, og om det endrer eneretten i Vedlegg 5, er ikke kjent.",en:"Open access applies where GlobalConnect's network reaches the homes, which ours doesn't until installation. How it works in practice, and whether it changes the exclusivity in Vedlegg 5, isn't known."},
+ k:{no:"Spør: kan andre leverandører levere over vårt nett etter oppkjøpet, og påvirker det eneretten og restavdragene?",en:"Ask: can other providers deliver over our network after the acquisition, and does that affect the exclusivity and remaining instalments?"}},
+{c:"agr",s:"part",w:"",
+ q:{no:"Gjelder vilkårene uendret uansett hvem som ender opp som eier av nettet?",en:"Do the terms stay unchanged whoever ends up owning the network?"},
+ a:{no:"Calle har bekreftet at Telenor-oppkjøpet ikke endrer vilkårene. Konkurransetilsynet krever at overlappende nett selges til andre, så eieren kan også bli en tredje aktør.",en:"Calle confirmed the Telenor acquisition doesn't change the terms. The competition authority requires overlapping networks to be sold, so the owner could also be a third party."},
+ k:{no:"Spør om vilkårene også gjelder hvis nettet selges til en annen enn Telenor.",en:"Ask whether the terms also hold if the network is sold to someone other than Telenor."}},
+{c:"agr",s:"open",w:"",
+ q:{no:"Hva skjer med restavdragene hvis GlobalConnect selv sier opp avtalen?",en:"What happens to the remaining instalments if GlobalConnect itself terminates?"},
+ a:{no:"GlobalConnect kan si opp med 3 måneders varsel (Vedlegg 2, 8.2). Calle skrev at dette er «dekket av vilkårene», men avtalen sier ikke tydelig hvem som da betaler restavdragene.",en:"GlobalConnect can terminate with 3 months' notice (Vedlegg 2, 8.2). Calle wrote that this is «covered by the terms», but the agreement doesn't clearly say who then pays the remainder."},
+ k:{no:"Be om et tydelig svar, gjerne skriftlig.",en:"Ask for a clear answer, ideally in writing."}},
+{c:"agr",s:"done",w:"Sondre",
+ q:{no:"Kan avklaringene skrives inn i avtalen?",en:"Can the clarifications be written into the agreement?"},
+ a:{no:"Nei. Avtalen er lik for over 2 500 boligselskaper og endres ikke. Avklaringene finnes på e-post.",en:"No. The agreement is the same for over 2,500 housing associations and won't be changed. Clarifications exist by email."},
+ k:{no:"Be Calle bekrefte svarene fra møtet skriftlig etterpå.",en:"Ask Calle to confirm tonight's answers in writing afterwards."}},
+{c:"agr",s:"done",w:"Marte",
+ q:{no:"Hvem er juridisk ansvarlig: sameiet, seksjonene eller hver eier?",en:"Who is legally responsible: the sameie, the units or each owner?"},
+ a:{no:"Sameiet er avtalepart. Etter vedtektene fordeles kostnadene likt, 1/7 per seksjon, og overfor tredjepart er sameierne solidarisk ansvarlige.",en:"The sameie is the contracting party. Under the vedtekter costs are split equally, 1/7 per unit, and towards third parties the owners are jointly liable."},
+ k:{no:"",en:""}},
+{c:"agr",s:"done",w:"",
+ q:{no:"Når må avtalen senest signeres?",en:"What's the latest date for signing?"},
+ a:{no:"Calle har sagt før 1. november. Konkurransetilsynet oppgir ingen dato for når oppkjøpet gjennomføres.",en:"Calle has said before 1 November. The competition authority gives no date for when the acquisition closes."},
+ k:{no:"Spør om siste mulige tidspunkt etter at avstemningen i Hudd er avsluttet.",en:"Ask for the latest possible time after the Hudd vote closes."}},
+/* OFFER */
+{c:"offer",s:"part",w:"",
+ q:{no:"Når kan prisen justeres første gang?",en:"When can the price first be adjusted?"},
+ a:{no:"Calle: ikke første eller siste år. Avtalen (Vedlegg 2, 3.3 a) sier at første KPI-justering kan skje ved første årsskifte etter signering.",en:"Calle: not in the first or last year. The agreement (Vedlegg 2, 3.3 a) says the first CPI adjustment can happen at the first new year after signing."},
+ k:{no:"Be om en skriftlig avklaring av motsetningen.",en:"Ask for written clarification of the contradiction."}},
+/* INSTALLATION */
+{c:"inst",s:"part",w:"Nabo",
+ q:{no:"Hvem har ansvaret for å vurdere grunnforholdene før graving?",en:"Who is responsible for assessing the ground before digging?"},
+ a:{no:"Bracom har ikke gjort en geoteknisk vurdering. NVE-kartet viser ingen kvikkleire langs traseen. GlobalConnect er ansvarlig for alle skader som skyldes arbeidet. Gravedybden er ikke oppgitt.",en:"Bracom made no geotechnical assessment. The NVE map shows no quick clay along the route. GlobalConnect is responsible for all damage caused by the work. Trench depth hasn't been stated."},
+ k:{no:"Spør om gravedybde og om Bracom vurderer grunnen før graving.",en:"Ask about trench depth and whether Bracom assesses the ground before digging."}},
+{c:"inst",s:"part",w:"Cecilie",
+ q:{no:"Kan vi bestemme hvor boksen ved nr. 39 plasseres?",en:"Can we decide where the box near no. 39 goes?"},
+ a:{no:"Det blir en liten koblingsboks i plast. Plasseringen avtales mellom styret og Bracom på befaringen etter signering. Vi har bedt om gavlveggen, men har ikke fått det bekreftet.",en:"It's a small plastic splice box. Placement is agreed between the board and Bracom at the survey after signing. We've asked for the gable wall, but it hasn't been confirmed."},
+ k:{no:"Be Calle bekrefte at boksen ikke settes i carport eller privat hage.",en:"Ask Calle to confirm the box won't go in a carport or private garden."}},
+{c:"inst",s:"done",w:"Cecilie",
+ q:{no:"Er det en frist for istandsetting etter graving, også om vinteren?",en:"Is there a deadline for restoring the ground after digging, also in winter?"},
+ a:{no:"Ingen fast frist, siden det avhenger av årstiden. GlobalConnect dekker alle skader som skyldes arbeidet.",en:"No fixed deadline, as it depends on the season. GlobalConnect covers all damage caused by the work."},
+ k:{no:"",en:""}},
+{c:"inst",s:"done",w:"Cecilie",
+ q:{no:"Kan fiberen føres inn ved stuevinduet i stedet for laveste etasje?",en:"Can the fiber enter at the living-room window instead of the lowest floor?"},
+ a:{no:"Hver eier bestemmer hvor fiberuttaket kommer. Fiber inne frem til ruteren er inkludert, inntil 20 m fra innføringen.",en:"Each owner decides where the fiber socket goes. Fiber inside up to the router is included, up to 20 m from the entry point."},
+ k:{no:"",en:""}},
+{c:"inst",s:"done",w:"Cecilie",
+ q:{no:"Blir det luftkabel på eiendommen vår?",en:"Will there be aerial cable on our property?"},
+ a:{no:"Nei. Luftstrekket slutter før innkjørselen vår, og alt derfra graves ned (skriftlig, 6. okt.).",en:"No. The aerial section ends before our driveway, and everything from there is buried (in writing, 6 Oct)."},
+ k:{no:"",en:""}},
+/* SERVICE */
+{c:"svc",s:"done",w:"",
+ q:{no:"Hvor raskt rettes feil, og får vi kompensasjon?",en:"How quickly are faults fixed, and is there compensation?"},
+ a:{no:"Nesten alle større feil rettes innen 16 timer, men det er et gjennomsnitt, ikke en garanti. Avtalen gir rett til prisavslag. Ellers vurderes kompensasjon fra sak til sak.",en:"Almost all major faults are fixed within 16 hours, but that's an average, not a guarantee. The agreement gives a right to a price reduction. Otherwise compensation is case by case."},
+ k:{no:"",en:""}},
+/* TELENOR */
+{c:"tel",s:"done",w:"Nabo",
+ q:{no:"Kan vi be Telenor om et tilbud nå, siden de skal overta GlobalConnect?",en:"Can we ask Telenor for an offer now, since they're taking over GlobalConnect?"},
+ a:{no:"Både Telenor og GlobalConnect sier at de ikke kan gi opplysninger om framtidige tilbud før oppkjøpet er gjennomført. I dag tilbyr Telenor bare koaks.",en:"Both Telenor and GlobalConnect say they can't give details on future offers until the acquisition closes. Today Telenor only offers coax."},
+ k:{no:"",en:""}},
+{c:"tel",s:"done",w:"",
+ q:{no:"Hva skjer hvis leveransen blir forsinket etter at vi har sagt opp Telenor?",en:"What if delivery is delayed after we've cancelled Telenor?"},
+ a:{no:"Den gamle avtalen forlenges vanligvis med 1–2 måneder. Ifølge Calle har det aldri vært et problem.",en:"The old agreement is usually extended by 1–2 months. According to Calle it has never been a problem."},
+ k:{no:"",en:""}},
+/* ALTERNATIVES */
+{c:"alt",s:"done",w:"Sondre",
+ q:{no:"Burde vi hente inn flere tilbud for å sammenligne?",en:"Shouldn't we get more offers to compare?"},
+ a:{no:"Forespørsel via Bytt.no i september. Viken Fiber (Altibox) og OBOS Nett har ikke fiber i området. NextGenTel, Telia og Talkmore tilbød bare å overta koaksnettet, eller hadde ikke noe tilbud.",en:"Request via Bytt.no in September. Viken Fiber (Altibox) and OBOS Nett have no fiber in the area. NextGenTel, Telia and Talkmore only offered to take over the coax, or had no offer."},
+ k:{no:"",en:""}},
+{c:"alt",s:"done",w:"Marte",
+ q:{no:"Hva med Starlink?",en:"What about Starlink?"},
+ a:{no:"Billigst ca. 460 kr for opptil 100 Mbit/s. Fiberlik hastighet koster ca. 940 kr. Ikke garantert, avhengig av vær og fri sikt, og egen antenne per hus.",en:"Cheapest ~460 kr for up to 100 Mbit/s. Near-fiber speed costs ~940 kr. Not guaranteed, depends on weather and clear sky, and a dish per house."},
+ k:{no:"",en:""}}
+];
+
+let lang="no", cat="all", onlyOpen=false;
+const $=id=>document.getElementById(id);
+try{const s=localStorage.getItem("q-lang");if(s==="en"||s==="no")lang=s}catch(e){}
+const T={
+ no:{h1:"Spørsmål til Calle · møtet 28. oktober",sub:"Spørsmål fra naboene, også fra dem som ikke kan komme. Svar vi allerede har fått, står under hvert spørsmål.",all:"Alle",open:"Åpne",search:"Søk…",ans:"Svar så langt",ask:"Spør i kveld",by:"Spurt av",empty:"Ingen treff.",leg:(o,t)=>`${o} åpne eller delvis besvarte av ${t}`},
+ en:{h1:"Questions for Calle · meeting 28 October",sub:"Questions from the neighbours, including those who can't attend. Answers we already have are shown under each question.",all:"All",open:"Open",search:"Search…",ans:"Answer so far",ask:"Ask tonight",by:"Asked by",empty:"No matches.",leg:(o,t)=>`${o} open or partly answered of ${t}`}
+};
+function renderCats(){
+  $("cats").innerHTML="";
+  const all={id:"all",no:"Alle kategorier",en:"All categories",c:"#005F73",on:"#FFFFFF"};
+  [all,...CATS].forEach(k=>{
+    const pool=Q.filter(x=>(k.id==="all"||x.c===k.id)&&(!onlyOpen||x.s!=="done"));
+    const b=document.createElement("button");
+    b.innerHTML=`<span>${k[lang]}</span><span class="n">${pool.length}</span>`;
+    b.setAttribute("aria-pressed",String(cat===k.id));
+    b.style.setProperty("--c",k.c);b.style.setProperty("--on",k.on);
+    b.onclick=()=>{cat=k.id;$("q").value="";render()};
+    $("cats").appendChild(b);
+  });
+}
+const strip=h=>h.toLowerCase();
+function render(){
+  const t=T[lang];
+  document.documentElement.lang=lang;
+  $("h1").textContent=t.h1;$("sub").textContent=t.sub;
+  $("l-no").setAttribute("aria-pressed",String(lang==="no"));
+  $("l-en").setAttribute("aria-pressed",String(lang==="en"));
+  $("f-all").textContent=t.all;$("f-open").textContent=t.open;
+  $("f-all").setAttribute("aria-pressed",String(!onlyOpen));
+  $("f-open").setAttribute("aria-pressed",String(onlyOpen));
+  $("legend").textContent=t.leg(Q.filter(x=>x.s!=="done").length,Q.length);
+  $("q").placeholder=t.search;
+  renderCats();
+  const term=$("q").value.trim().toLowerCase();
+  const list=Q.filter(x=>(!onlyOpen||x.s!=="done")&&(term?strip(x.q[lang]+" "+x.a[lang]+" "+x.k[lang]+" "+x.w).includes(term):(cat==="all"||x.c===cat)));
+  const g=$("grid");g.innerHTML="";
+  list.forEach(x=>{
+    const k=CATS.find(c=>c.id===x.c);
+    const d=document.createElement("article");d.className="card";
+    d.style.setProperty("--c",k.c);d.style.setProperty("--on",k.on);
+    let h=`<div class="meta"><span class="cat">${k[lang]}</span><span class="st ${x.s}">${ST[x.s][lang]}</span>${x.w?`<span class="who">${t.by}: ${x.w}</span>`:""}</div><h2>${x.q[lang]}</h2>`;
+    if(x.a[lang])h+=`<div class="a"><div class="lbl">${t.ans}</div><p>${x.a[lang]}</p></div>`;
+    if(x.k[lang])h+=`<div class="a ask"><div class="lbl">${t.ask}</div><p>${x.k[lang]}</p></div>`;
+    d.innerHTML=h;g.appendChild(d);
+  });
+  $("empty").hidden=list.length>0;$("empty").textContent=t.empty;
+  if(term)[...$("cats").children].forEach(b=>b.setAttribute("aria-pressed","false"));
+}
+$("l-no").onclick=()=>{lang="no";try{localStorage.setItem("q-lang",lang)}catch(e){};render()};
+$("l-en").onclick=()=>{lang="en";try{localStorage.setItem("q-lang",lang)}catch(e){};render()};
+$("f-all").onclick=()=>{onlyOpen=false;render()};
+$("f-open").onclick=()=>{onlyOpen=true;render()};
+$("q").addEventListener("input",render);
+render();
+</script>
+
+</body>
+</html>
